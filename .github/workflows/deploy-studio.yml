@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: deploy       # 👈 this matches the environment you created
     steps:
       - uses: actions/checkout@v4
 
@@ -15,13 +16,9 @@ jobs:
           node-version: 20
 
       - name: Install deps
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
-      # optional: sanity deploy does its own build; this is just a smoke check
-      - name: Build (optional)
-        run: npm run build
-
-      - name: Deploy to Sanity (non-interactive)
-        run: npm run deploy -- --non-interactive
+      - name: Deploy to Sanity
+        run: npx sanity deploy --non-interactive --token "$SANITY_AUTH_TOKEN"
         env:
           SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
