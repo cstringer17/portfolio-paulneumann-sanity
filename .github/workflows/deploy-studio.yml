@@ -1,0 +1,27 @@
+name: Deploy Sanity Studio
+
+on:
+  push:
+    branches: [live]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      # optional: sanity deploy does its own build; this is just a smoke check
+      - name: Build (optional)
+        run: npm run build
+
+      - name: Deploy to Sanity (non-interactive)
+        run: npm run deploy -- --non-interactive
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
